@@ -1,11 +1,30 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../context/I18nContext'
-import { useNavigate } from 'react-router-dom'
-import Header from '../components/ui/Header'
-import NavigationBar from '../components/ui/NavigationBar'
-import DashboardCard from '../components/ui/DashboardCard'
-import { Card, Button, StatusPill, Toggle } from '../components/ui'
+import { useNavigate, Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { 
+  Shield, 
+  MapPin, 
+  AlertTriangle, 
+  TrendingUp, 
+  Users, 
+  Bell, 
+  Settings, 
+  LogOut,
+  Menu,
+  X,
+  ChevronRight,
+  Activity,
+  Cloud,
+  Droplets,
+  Wind,
+  Thermometer,
+  Eye,
+  Calendar,
+  Clock,
+  Zap
+} from 'lucide-react'
 
 interface WeatherData {
   temperature: number
@@ -37,10 +56,10 @@ interface CityRisk {
 }
 
 export default function Dashboard() {
-  const { role } = useAuth()
+  const { role, logout } = useAuth()
   const { t } = useI18n()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('overview')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [weatherData, setWeatherData] = useState<WeatherData>({
     temperature: 28.5,
@@ -58,20 +77,18 @@ export default function Dashboard() {
     {
       id: '1',
       type: 'warning',
-      message: t('msg.heavyRainfallExpected'),
+      message: 'Heavy rainfall expected in next 6 hours',
       timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
       isRead: false
     },
     {
       id: '2',
       type: 'info',
-      message: t('msg.waterLevelMonitoring'),
+      message: 'Water level monitoring active',
       timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
       isRead: true
     }
   ])
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
-  const [autoRefresh, setAutoRefresh] = useState(true)
   const [activeLayer, setActiveLayer] = useState('flood-risk')
 
   // City risk data matching the example
@@ -86,26 +103,24 @@ export default function Dashboard() {
 
   useEffect(() => {
     // Simulate loading
-    const timer = setTimeout(() => setIsLoading(false), 1500)
+    const timer = setTimeout(() => setIsLoading(false), 1000)
     return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
-    if (autoRefresh) {
-      const interval = setInterval(() => {
-        // Simulate real-time data updates
-        setWeatherData(prev => ({
-          ...prev,
-          temperature: prev.temperature + (Math.random() - 0.5) * 2,
-          humidity: Math.max(40, Math.min(90, prev.humidity + (Math.random() - 0.5) * 10)),
-          rainfall: Math.max(0, prev.rainfall + (Math.random() - 0.5) * 5),
-          windSpeed: Math.max(0, prev.windSpeed + (Math.random() - 0.5) * 3)
-        }))
-      }, 30000) // Update every 30 seconds
+    // Simulate real-time data updates
+    const interval = setInterval(() => {
+      setWeatherData(prev => ({
+        ...prev,
+        temperature: prev.temperature + (Math.random() - 0.5) * 2,
+        humidity: Math.max(40, Math.min(90, prev.humidity + (Math.random() - 0.5) * 10)),
+        rainfall: Math.max(0, prev.rainfall + (Math.random() - 0.5) * 5),
+        windSpeed: Math.max(0, prev.windSpeed + (Math.random() - 0.5) * 3)
+      }))
+    }, 30000) // Update every 30 seconds
 
-      return () => clearInterval(interval)
-    }
-  }, [autoRefresh])
+    return () => clearInterval(interval)
+  }, [])
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -163,219 +178,270 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-cyan-50 to-emerald-50 flex items-center justify-center">
-        <div className="text-center animate-fade-in">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-6"></div>
-            <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin mx-auto" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-          </div>
-          <h2 className="text-2xl font-bold text-violet-700 mb-2">🌊 {t('dash.loadingFloodMonitor')}</h2>
-          <p className="text-cyan-600 text-lg">{t('dash.preparingDashboard')}</p>
-          <div className="mt-4 flex justify-center space-x-2">
-            <div className="w-2 h-2 bg-violet-400 rounded-full hover:animate-bounce transition-all duration-300" style={{ animationDelay: '0s' }}></div>
-            <div className="w-2 h-2 bg-cyan-400 rounded-full hover:animate-bounce transition-all duration-300" style={{ animationDelay: '0.1s' }}></div>
-            <div className="w-2 h-2 bg-emerald-400 rounded-full hover:animate-bounce transition-all duration-300" style={{ animationDelay: '0.2s' }}></div>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Dashboard</h2>
+          <p className="text-gray-600">Preparing your flood monitoring data...</p>
+        </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-violet-50 via-cyan-50 to-emerald-50 overflow-hidden flex flex-col relative">
-      {/* Animated Weather Widget Row */}
-      <div className="flex justify-between items-center gap-2 mb-2 animate-fade-in">
-        <div className="flex-1 flex flex-col items-center bg-white/80 rounded-xl p-2 shadow card-hover animate-float">
-          <span className="text-2xl hover:animate-bounce transition-all duration-300">🌡️</span>
-                      <span className="font-bold text-lg">{weatherData.temperature.toFixed(1)}°C</span>
-            <span className="text-xs text-slate-500">{t('dash.temperature')}</span>
-        </div>
-        <div className="flex-1 flex flex-col items-center bg-white/80 rounded-xl p-2 shadow card-hover animate-float-delay-1">
-          <span className="text-2xl animate-wave">🌧️</span>
-                      <span className="font-bold text-lg">{weatherData.rainfall.toFixed(1)} mm</span>
-            <span className="text-xs text-slate-500">{t('dash.rainfall')}</span>
-        </div>
-        <div className="flex-1 flex flex-col items-center bg-white/80 rounded-xl p-2 shadow card-hover animate-float-delay-2">
-          <span className="text-2xl animate-pulse">💧</span>
-                      <span className="font-bold text-lg">{weatherData.humidity.toFixed(0)}%</span>
-            <span className="text-xs text-slate-500">{t('dash.humidity')}</span>
-        </div>
-        <div className="flex-1 flex flex-col items-center bg-white/80 rounded-xl p-2 shadow card-hover animate-float-delay-3">
-          <span className="text-2xl hover:animate-bounce-rotate transition-all duration-300">💨</span>
-                      <span className="font-bold text-lg">{weatherData.windSpeed.toFixed(1)} km/h</span>
-            <span className="text-xs text-slate-500">{t('dash.wind')}</span>
-        </div>
-      </div>
-
-      {/* Live Alert Ticker */}
-      <div className="w-full flex items-center bg-gradient-to-r from-red-100 via-orange-100 to-yellow-100 rounded-xl px-4 py-1 mb-2 shadow animate-fade-in">
-        <span className="mr-2 animate-ping text-red-500">🔴</span>
-        <span className="font-semibold text-sm text-red-700 animate-slide-left">
-          {alerts.find(a => !a.isRead)?.message || t('dash.noNewAlerts')}
-        </span>
-        <span className="ml-auto text-xs text-slate-500 animate-fade-in">{alerts.find(a => !a.isRead)?.timestamp ? t('dash.new') : t('dash.updated')}</span>
-      </div>
-
-      {/* Main Dashboard Content */}
-      <div className="flex-1 p-2 space-y-2 overflow-hidden">
-        {/* Live Risk Monitor Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-2 shadow-lg flex-shrink-0">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-                          <h2 className="text-lg font-bold text-slate-800">{t('dash.liveRiskMonitor')}</h2>
-            <span className="ml-2 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold animate-pulse">{t('dash.live')}</span>
-          </div>
-          <p className="text-xs text-slate-600">{t('dash.updatesEvery3Hours')}</p>
-          </div>
-          {/* City Risk Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-            {cityRisks.map((city, index) => (
-              <div key={city.name} className={`bg-white rounded-lg p-2 shadow-sm border border-slate-200 hover:animate-bounce transition-all duration-300 ${index % 2 === 0 ? 'hover:animate-float' : 'hover:animate-float-delay-1'}`} style={{ animationDelay: `${index * 0.1}s` }}>
-                <div className="flex items-center space-x-1 mb-1">
-                  <span className="text-red-500 text-xs animate-pulse">{getRiskIcon(city.risk)}</span>
-                  <div>
-                    <h3 className="font-semibold text-slate-800 text-xs">{city.name}</h3>
-                    <p className="text-xs text-slate-500">{city.state}</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className={`px-1 py-0.5 rounded-full text-xs font-semibold ${getRiskColor(city.risk)} animate-enhanced-pulse-color`}>
-                    {t(`risk.${city.risk}`)}
-                  </span>
-                  <span className="text-xs text-slate-600">{city.percentage}%</span>
-                </div>
-                <div className="w-full bg-slate-200 rounded-full h-1">
-                  <div
-                    className={`h-1 rounded-full ${getRiskBarColor(city.risk)} transition-all duration-1000 animate-gradient-shift`}
-                    style={{ width: `${city.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 flex-1 min-h-0">
-          {/* Interactive Risk Map */}
-          <div className="lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden flex flex-col">
-            <div className="p-2 border-b border-slate-200 flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <h3 className="text-base font-bold text-slate-800">{t('dash.interactiveRiskMap')}</h3>
-                <span className="text-xs text-slate-500 animate-fade-in">{t('dash.lastUpdatedTime')}: {new Date().toLocaleTimeString()}</span>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-y-auto">
+      {/* Professional Navigation Header */}
+      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-4">
+              <Link to="/" className="flex items-center space-x-2">
+                <Shield className="w-8 h-8 text-blue-600" />
+                <span className="text-xl font-bold text-gray-900">AegisFlood</span>
+              </Link>
+              <div className="hidden md:flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                <button className="px-3 py-1 text-sm font-medium text-blue-600 bg-white rounded-md shadow-sm">Dashboard</button>
+                <Link to="/recent-alerts" className="px-3 py-1 text-sm font-medium text-gray-600 hover:text-gray-900">Alerts</Link>
+                <Link to="/community-chat" className="px-3 py-1 text-sm font-medium text-gray-600 hover:text-gray-900">Community</Link>
               </div>
             </div>
-            <div className="flex flex-1 min-h-0 h-48">
-              {/* Layers Panel */}
-              <div className="w-28 bg-slate-50 p-2 border-r border-slate-200 flex-shrink-0">
-                <h4 className="font-semibold text-slate-800 mb-1 text-xs">Layers</h4>
+            <div className="flex items-center space-x-4">
+              <button className="p-2 text-gray-600 hover:text-gray-900 relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">2</span>
+              </button>
+              <button 
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="md:hidden p-2 text-gray-600 hover:text-gray-900"
+              >
+                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+              <div className="hidden md:flex items-center space-x-2">
+                <button className="p-2 text-gray-600 hover:text-gray-900">
+                  <Settings className="w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => { logout(); navigate('/'); }}
+                  className="p-2 text-gray-600 hover:text-gray-900"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      {/* Main Content Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        {/* Weather Overview Cards */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        >
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Temperature</p>
+                <p className="text-2xl font-bold text-gray-900">{weatherData.temperature.toFixed(1)}°C</p>
+              </div>
+              <Thermometer className="w-8 h-8 text-orange-500" />
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Rainfall</p>
+                <p className="text-2xl font-bold text-gray-900">{weatherData.rainfall.toFixed(1)} mm</p>
+              </div>
+              <Cloud className="w-8 h-8 text-blue-500" />
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Humidity</p>
+                <p className="text-2xl font-bold text-gray-900">{weatherData.humidity.toFixed(0)}%</p>
+              </div>
+              <Droplets className="w-8 h-8 text-cyan-500" />
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Wind Speed</p>
+                <p className="text-2xl font-bold text-gray-900">{weatherData.windSpeed.toFixed(1)} km/h</p>
+              </div>
+              <Wind className="w-8 h-8 text-gray-500" />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Alert Banner */}
+        {alerts.find(a => !a.isRead) && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-amber-50 border border-amber-200 rounded-xl p-4"
+          >
+            <div className="flex items-center space-x-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-amber-800">
+                  {alerts.find(a => !a.isRead)?.message}
+                </p>
+                <p className="text-xs text-amber-600 mt-1">
+                  {new Date(alerts.find(a => !a.isRead)?.timestamp || '').toLocaleTimeString()}
+                </p>
+              </div>
+              <button 
+                onClick={() => markAlertAsRead(alerts.find(a => !a.isRead)?.id || '')}
+                className="text-amber-600 hover:text-amber-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Main Content Grid - Risk Map takes 50% of whole page */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[70vh]">
+          
+          {/* Risk Map Section - 50% of whole page */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-full"
+          >
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">Interactive Risk Map</h2>
+                <div className="flex items-center space-x-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <Activity className="w-3 h-3 mr-1" />
+                    Live
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="h-[calc(100%-5rem)] relative">
+              {/* Map Placeholder */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+                <div className="text-center">
+                  <MapPin className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Risk Map Visualization</h3>
+                  <p className="text-gray-600 max-w-sm">
+                    Interactive flood risk mapping with real-time data visualization and predictive analytics
+                  </p>
+                </div>
+              </div>
+              
+              {/* Map Controls */}
+              <div className="absolute top-4 right-4 flex flex-col space-y-2">
+                <button className="w-8 h-8 bg-white rounded-lg shadow-sm border border-gray-200 flex items-center justify-center hover:bg-gray-50">
+                  <span className="text-sm font-medium">+</span>
+                </button>
+                <button className="w-8 h-8 bg-white rounded-lg shadow-sm border border-gray-200 flex items-center justify-center hover:bg-gray-50">
+                  <span className="text-sm font-medium">-</span>
+                </button>
+              </div>
+              
+              {/* Layer Controls */}
+              <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                <h4 className="text-sm font-medium text-gray-900 mb-2">Layers</h4>
                 <div className="space-y-1">
                   {[
-                    { id: 'flood-risk', name: 'Flood Risk', icon: '☁️' },
-                    { id: 'rainfall', name: 'Rainfall', icon: '🌧️' },
-                    { id: 'river-levels', name: 'River Levels', icon: '🌊' },
-                    { id: 'incidents', name: 'Incidents', icon: '⚠️' }
+                    { id: 'flood-risk', name: 'Flood Risk', active: activeLayer === 'flood-risk' },
+                    { id: 'rainfall', name: 'Rainfall', active: activeLayer === 'rainfall' },
+                    { id: 'river-levels', name: 'River Levels', active: activeLayer === 'river-levels' }
                   ].map((layer) => (
                     <button
                       key={layer.id}
                       onClick={() => setActiveLayer(layer.id)}
-                      className={`w-full flex items-center space-x-2 p-1 rounded-lg text-left transition-colors text-xs ${
-                        activeLayer === layer.id 
-                          ? 'bg-blue-100 text-blue-700 border border-blue-300 animate-pulse' 
-                          : 'hover:bg-slate-100 text-slate-700'
+                      className={`block w-full text-left px-2 py-1 text-xs rounded ${
+                        layer.active 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : 'text-gray-600 hover:bg-gray-50'
                       }`}
                     >
-                      <span>{layer.icon}</span>
-                      <span>{layer.name}</span>
+                      {layer.name}
                     </button>
                   ))}
                 </div>
               </div>
-              {/* Map Content Area */}
-              <div className="flex-1 p-2 relative">
-                <div className="h-full bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center animate-fade-in">
-                  <div className="text-center">
-                    <div className="text-3xl mb-2 animate-float">🗺️</div>
-                    <h4 className="text-sm font-semibold text-slate-700 mb-1">{t('dash.mapReadyForML')}</h4>
-                    <p className="text-xs text-slate-600 max-w-xs">
-                      {t('dash.mapDescription')}
-                    </p>
-                  </div>
-                </div>
-                {/* Map Controls */}
-                <div className="absolute top-2 right-2 flex flex-col space-y-1">
-                  <button className="w-6 h-6 bg-blue-500 text-white rounded flex items-center justify-center hover:bg-blue-600 transition-colors text-xs hover:animate-bounce transition-all duration-300">+</button>
-                  <button className="w-6 h-6 bg-blue-500 text-white rounded flex items-center justify-center hover:bg-blue-600 transition-colors text-xs hover:animate-bounce transition-all duration-300">-</button>
-                  <button className="w-6 h-6 bg-blue-500 text-white rounded flex items-center justify-center hover:bg-blue-600 transition-colors text-xs animate-spin">🔄</button>
-                </div>
-                {/* Floating cloud background */}
-                <div className="absolute left-4 top-4 w-8 h-8 animate-float-delay-2 opacity-30 pointer-events-none select-none">☁️</div>
-                <div className="absolute right-8 bottom-8 w-8 h-8 animate-float-delay-3 opacity-20 pointer-events-none select-none">💧</div>
-                {/* Bottom Indicators */}
-                <div className="absolute bottom-2 left-2 text-xs text-slate-500 animate-fade-in">{t('dash.timeFrame')}: {t('dash.current')}</div>
-                <div className="absolute bottom-2 right-2 text-xs text-slate-500 animate-fade-in">{t('dash.showing')}: {t('dash.current')}</div>
-              </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Right Column */}
-          <div className="space-y-2 flex flex-col h-full">
-            {/* High Risk Calendar */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-2 shadow-lg flex-1 min-h-0 animate-fade-in">
-                              <h3 className="text-base font-bold text-slate-800 mb-2 flex items-center space-x-2">
-                  <span>📅</span>
-                  <span>{t('dash.highRiskCalendar')}</span>
-                </h3>
-              {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-1">
-                {/* Days of Week */}
-                {['S','M','T','W','T','F','S'].map((d, i) => <div key={i} className="text-center text-xs font-medium text-slate-600">{d}</div>)}
-                {/* Calendar Days */}
-                {Array.from({ length: 35 }, (_, i) => {
-                  const day = i + 1
-                  const isHighRisk = [6, 7, 9, 18, 19, 20].includes(day)
-                  const isMediumRisk = [4, 5, 10, 17, 22].includes(day)
-                  const isLowRisk = [1, 2, 3, 11, 12, 13, 14, 15, 16, 21].includes(day)
-                  let bgColor = 'bg-slate-100'
-                  if (isHighRisk) bgColor = 'bg-red-100 animate-pulse'
-                  else if (isMediumRisk) bgColor = 'bg-orange-100 animate-pulse'
-                  else if (isLowRisk) bgColor = 'bg-emerald-100 animate-pulse'
-                  return (
-                    <div key={i} className={`h-4 ${bgColor} rounded text-center text-xs flex items-center justify-center`}>
-                      {day <= 31 ? day : ''}
+          {/* Right Column - Stats and Info */}
+          <div className="space-y-6">
+            
+
+            {/* Recent Activity */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            >
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+              <div className="space-y-3">
+                {alerts.map((alert) => (
+                  <div key={alert.id} className="flex items-start space-x-3">
+                    <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${
+                      alert.type === 'warning' ? 'bg-amber-400' : 'bg-blue-400'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900">{alert.message}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(alert.timestamp).toLocaleTimeString()}
+                      </p>
                     </div>
-                  )
-                })}
+                  </div>
+                ))}
               </div>
-            </div>
-            {/* Prediction Timeline */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-2 shadow-lg flex-1 min-h-0 animate-fade-in">
-                              <h3 className="text-base font-bold text-slate-800 mb-2 flex items-center space-x-2">
-                  <span>⏰</span>
-                  <span>{t('dash.predictionTimeline')}</span>
-                </h3>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-600">{t('dash.predictionTime')}:</span>
-                  <span className="text-xs font-semibold text-slate-800">{t('dash.now')}</span>
-                </div>
-                {/* Timeline visualization with moving indicator */}
-                <div className="h-12 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300 flex items-center relative overflow-hidden">
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-2 flex items-center">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <div key={i} className="flex-1 h-2 mx-0.5 rounded-full bg-blue-200"></div>
-                    ))}
-                  </div>
-                  {/* Moving dot */}
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 animate-gradient-shift" style={{ left: `${(Date.now() % 24000) / 24000 * 100}%` }}>
-                    <div className="w-4 h-4 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full shadow-lg animate-pulse border-2 border-white"></div>
-                  </div>
-                  <div className="w-full text-center z-10">
-                    <span className="text-xs text-slate-600">{t('dash.timelineVisualization')}</span>
-                  </div>
-                </div>
+              <Link 
+                to="/recent-alerts" 
+                className="mt-4 inline-flex items-center text-sm text-blue-600 hover:text-blue-700"
+              >
+                View all alerts
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Link>
+            </motion.div>
+
+            {/* Quick Actions */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            >
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <Link 
+                  to="/recent-alerts"
+                  className="flex items-center justify-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Bell className="w-5 h-5 text-gray-600 mr-2" />
+                  <span className="text-sm font-medium text-gray-900">Alerts</span>
+                </Link>
+                <Link 
+                  to="/community-chat"
+                  className="flex items-center justify-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Users className="w-5 h-5 text-gray-600 mr-2" />
+                  <span className="text-sm font-medium text-gray-900">Community</span>
+                </Link>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

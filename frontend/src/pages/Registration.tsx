@@ -1,12 +1,10 @@
 import { useState } from 'react'
-import Card from '../components/shared/Card'
-import Input from '../components/shared/Input'
-import Button from '../components/shared/Button'
+import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { Shield, ArrowLeft, MapPin, Phone, Globe, Bell, CheckCircle, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
-import { Link, useNavigate } from 'react-router-dom'
 import { useI18n } from '../context/I18nContext'
-import { useRef } from 'react'
 
 type RegistrationData = {
   location: string
@@ -21,7 +19,7 @@ type RegistrationData = {
 export default function Registration() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const { setLanguage, t } = useI18n()
+  const { setLanguage } = useI18n()
   const [currentStep, setCurrentStep] = useState(1)
   const [registrationData, setRegistrationData] = useState<RegistrationData>({
     location: '',
@@ -36,87 +34,113 @@ export default function Registration() {
   const [otpSent, setOtpSent] = useState(false)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
-  const [otpDigits, setOtpDigits] = useState(['', '', '', ''])
-  const otpInputs = [useRef(null), useRef(null), useRef(null), useRef(null)]
+  const [error, setError] = useState('')
 
   const steps = [
-    { id: 1, title: 'Location', icon: '📍' },
-    { id: 2, title: 'Phone', icon: '📱' },
-    { id: 3, title: 'Language', icon: '🌐' },
-    { id: 4, title: 'Alerts', icon: '🔔' }
+    { id: 1, title: 'Location', icon: MapPin },
+    { id: 2, title: 'Phone', icon: Phone },
+    { id: 3, title: 'Language', icon: Globe },
+    { id: 4, title: 'Alerts', icon: Bell }
   ]
 
   const updateData = (field: keyof RegistrationData, value: any) => {
     setRegistrationData(prev => ({ ...prev, [field]: value }))
   }
 
-  const sendOTP = async () => {
-    // BYPASS: Immediately allow OTP entry for demo
-    setOtpSent(true)
-    setMessage('OTP sent. Use 0000 for demo.')
-    setLoading(false)
-    // Do not make any API call
-    return
-    // The code below is now unreachable
-    /*
-    setLoading(true)
-    setMessage('')
-    try {
-      await api.post('/auth/register', { 
-        phone_number: registrationData.phone,
-        location: registrationData.location, // Send as location field
-        language: registrationData.language
-      })
-      setOtpSent(true)
-      setMessage('OTP sent. Use 0000 for demo.')
-    } catch (error) {
-      setMessage('Error sending OTP. Please try again.')
-    }
-    setLoading(false)
-    */
-  }
-
-  const verifyOTP = async () => {
-    setLoading(true)
-    setMessage('')
-    // TEMPORARY: Allow '0000' as a valid OTP without API call
-    if (otp === '0000') {
-      setMessage('Phone verified successfully (demo)')
-      setOtp('')
-      setCurrentStep(3) // Go to Language Preference
-      setLoading(false)
-      return
-    }
-    // Optionally, you can keep the API call for real OTPs
-    setMessage('Invalid OTP. Please try again.')
-    setLoading(false)
-  }
-
   const nextStep = () => {
-    if (currentStep < 4) setCurrentStep(currentStep + 1)
-  }
-  const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1)
-  }
-
-  const canComplete = registrationData.alerts.sms || registrationData.alerts.whatsapp
-
-  const handleOtpInput = (index: number, value: string) => {
-    if (!/^[0-9]?$/.test(value)) return
-    const newDigits = [...otpDigits]
-    newDigits[index] = value
-    setOtpDigits(newDigits)
-    if (value && index < 3) {
-      (otpInputs[index + 1].current as any)?.focus()
+    if (currentStep < 4) {
+      setCurrentStep(currentStep + 1)
     }
-    if (newDigits.join('') === '0000') {
+  }
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const sendOtp = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      // Temporarily bypass API call and simulate OTP sent
+      // await api.post('/auth/send-otp', { phone: registrationData.phone })
+      setOtpSent(true)
+      setMessage('For demo purposes, please enter 0000 as OTP')
+    } catch (error) {
+      // Fallback to demo mode
+      setOtpSent(true)
+      setMessage('For demo purposes, please enter 0000 as OTP')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const verifyOtp = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      // Check for demo OTP first
+      if (otp === '0000') {
+        setMessage('Phone verified successfully!')
+        setTimeout(() => {
+          nextStep()
+        }, 500) // Smooth transition delay
+        return
+      }
+      
+      // Try API verification for real OTPs
+      await api.post('/auth/verify-otp', { phone: registrationData.phone, otp })
+      setMessage('Phone verified successfully!')
       setTimeout(() => {
-        setOtp('0000')
-        setOtpDigits(['', '', '', ''])
-        setOtpSent(false)
-        setMessage('Phone verified successfully (demo)')
-        setCurrentStep(3)
-      }, 300)
+        nextStep()
+      }, 500)
+    } catch (error) {
+      // If API fails but user entered demo OTP, allow it
+      if (otp === '0000') {
+        setMessage('Phone verified successfully!')
+        setTimeout(() => {
+          nextStep()
+        }, 500)
+      } else {
+        setError('Invalid OTP. Please try 0000 for demo.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const submitRegistration = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      // Demo mode - bypass API and proceed directly
+      setMessage('Registration successful! Redirecting...')
+      
+      // Simulate successful login for demo
+      login('demo-token', 'citizen')
+      setLanguage(registrationData.language)
+      
+      // Smooth transition to dashboard
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 1000)
+      
+      // Uncomment below for real API integration
+      // const response = await api.post('/auth/register', registrationData)
+      // login(response.data.access_token, response.data.role)
+      // setLanguage(registrationData.language)
+      // navigate('/dashboard')
+    } catch (error) {
+      // Fallback to demo mode even if API fails
+      setMessage('Registration successful! Redirecting...')
+      login('demo-token', 'citizen')
+      setLanguage(registrationData.language)
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 1000)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -124,330 +148,374 @@ export default function Registration() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-6 animate-slide-up">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg hover:animate-bounce transition-all duration-300">
-                <span className="text-3xl">📍</span>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            <div className="text-center mb-6">
+              <MapPin className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+              <h3 className="text-xl font-semibold text-gray-900">Your Location</h3>
+              <p className="text-gray-600">Help us provide accurate flood alerts for your area</p>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Location
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={registrationData.location}
+                    onChange={(e) => updateData('location', e.target.value)}
+                    placeholder="Enter your city or district"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                </div>
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Choose Location</h2>
-              <p className="text-gray-600">Select your area to get accurate flood risk information and alerts.</p>
+              
+              <button 
+                onClick={nextStep} 
+                disabled={!registrationData.location}
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center space-x-2"
+              >
+                <span>Continue</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              
+              <Link 
+                to="/login" 
+                className="w-full block text-center py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all"
+              >
+                Back to Login
+              </Link>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Location (City, District, State)</label>
-              <Input 
-                placeholder="e.g., Guwahati, Kamrup, Assam" 
-                value={registrationData.location} 
-                onChange={e => updateData('location', e.target.value)}
-                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-              />
-              <p className="text-xs text-gray-500 mt-2">Enter your complete address including city, district, and state.</p>
-            </div>
-            <Button 
-              onClick={nextStep} 
-              disabled={!registrationData.location.trim()} 
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200"
-            >
-              Next → <span className="ml-2">🚀</span>
-            </Button>
-          </div>
+          </motion.div>
         )
-
+      
       case 2:
         return (
-          <div className="space-y-6 animate-slide-up">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg hover:animate-bounce transition-all duration-300">
-                <span className="text-3xl">📱</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Phone Verification</h2>
-              <p className="text-gray-600">We'll send a verification code to confirm your phone number.</p>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            <div className="text-center mb-6">
+              <Phone className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+              <h3 className="text-xl font-semibold text-gray-900">Phone Verification</h3>
+              <p className="text-gray-600">We'll send you alerts and updates via SMS</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-              <Input
-                placeholder="+91 98765 43210"
-                value={registrationData.phone}
-                onChange={e => updateData('phone', e.target.value)}
-                className={`w-full p-3 border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all ${otpSent ? "opacity-60 pointer-events-none" : ""}`}
-              />
-            </div>
-            {!otpSent ? (
-              <div className="space-y-3">
-                <Button 
-                  onClick={sendOTP} 
-                  disabled={!registrationData.phone.trim() || loading} 
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 transform hover:scale-105 transition-all duration-200"
-                >
-                  {loading ? 'Sending...' : 'Send OTP'} <span className="ml-2">📤</span>
-                </Button>
-                <Button 
-                  onClick={prevStep} 
-                  variant="secondary" 
-                  className="w-full bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 transform hover:scale-105 transition-all duration-200"
-                >
-                  ← Back <span className="ml-2">↩️</span>
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Enter OTP</label>
-                  <Input 
-                    placeholder="0000" 
-                    value={otp} 
-                    onChange={e => setOtp(e.target.value)}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-center text-lg font-mono"
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="tel"
+                    value={registrationData.phone}
+                    onChange={(e) => updateData('phone', e.target.value)}
+                    placeholder="Enter your phone number"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    disabled={otpSent}
                   />
                 </div>
-                <Button 
-                  onClick={verifyOTP} 
-                  disabled={!otp.trim() || loading} 
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 transform hover:scale-105 transition-all duration-200"
-                >
-                  {loading ? 'Verifying...' : 'Verify OTP'} <span className="ml-2">✅</span>
-                </Button>
-                <Button 
-                  onClick={() => setOtpSent(false)} 
-                  variant="secondary" 
-                  className="w-full bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 transform hover:scale-105 transition-all duration-200"
-                >
-                  Resend OTP <span className="ml-2">🔄</span>
-                </Button>
               </div>
-            )}
-          </div>
+              
+              {!otpSent ? (
+                <>
+                  <button 
+                    onClick={sendOtp} 
+                    disabled={!registrationData.phone || loading}
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    {loading ? 'Sending OTP...' : 'Send OTP'}
+                  </button>
+                  <button 
+                    onClick={prevStep} 
+                    className="w-full py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all"
+                  >
+                    Back
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Enter OTP
+                    </label>
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="Enter 4-digit OTP"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-center text-lg tracking-widest"
+                      maxLength={4}
+                    />
+                  </div>
+                  <button 
+                    onClick={verifyOtp} 
+                    disabled={otp.length !== 4 || loading}
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    {loading ? 'Verifying...' : 'Verify OTP'}
+                  </button>
+                  <button 
+                    onClick={() => setOtpSent(false)} 
+                    className="w-full py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all"
+                  >
+                    Change Phone Number
+                  </button>
+                </>
+              )}
+            </div>
+          </motion.div>
         )
-
+      
       case 3:
         return (
-          <div className="space-y-6 animate-slide-up">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg hover:animate-bounce transition-all duration-300">
-                <span className="text-3xl">🌐</span>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            <div className="text-center mb-6">
+              <Globe className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+              <h3 className="text-xl font-semibold text-gray-900">Preferred Language</h3>
+              <p className="text-gray-600">Choose your preferred language for alerts</p>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { code: 'en', name: 'English' },
+                  { code: 'hi', name: 'हिंदी' },
+                  { code: 'as', name: 'অসমীয়া' },
+                  { code: 'ta', name: 'தமிழ்' }
+                ].map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => updateData('language', lang.code)}
+                    className={`p-4 border-2 rounded-lg text-center transition-all font-medium ${
+                      registrationData.language === lang.code
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                    }`}
+                  >
+                    {lang.name}
+                  </button>
+                ))}
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Choose Language</h2>
-              <p className="text-gray-600">Select your preferred language for alerts and interface.</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Language</label>
-              <select 
-                value={registrationData.language}
-                onChange={e => {
-                  const lang = e.target.value as RegistrationData['language']
-                  updateData('language', lang)
-                  setLanguage(lang)
-                }}
-                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all bg-white"
-              >
-                <option value="en">🇺🇸 English</option>
-                <option value="hi">🇮🇳 Hindi</option>
-                <option value="as">🇮🇳 Assamese</option>
-                <option value="ta">🇮🇳 Tamil</option>
-              </select>
-            </div>
-            <div className="flex space-x-3">
-              <Button 
-                onClick={prevStep} 
-                variant="secondary" 
-                className="flex-1 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 transform hover:scale-105 transition-all duration-200"
-              >
-                ← Back <span className="ml-2">↩️</span>
-              </Button>
-              <Button 
+              
+              <button 
                 onClick={nextStep} 
-                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 transform hover:scale-105 transition-all duration-200"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-all flex items-center justify-center space-x-2"
               >
-                Next → <span className="ml-2">🚀</span>
-              </Button>
+                <span>Continue</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              
+              <button 
+                onClick={prevStep} 
+                className="w-full py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all"
+              >
+                Back
+              </button>
             </div>
-          </div>
+          </motion.div>
         )
-
+      
       case 4:
         return (
-          <div className="flex flex-col flex-1 min-h-0 animate-slide-up">
-            <div className="flex-1 min-h-0 space-y-6 overflow-y-auto pr-1">
-              <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg hover:animate-bounce transition-all duration-300">
-                  <span className="text-3xl">🔔</span>
-                </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('reg.alertPrefs')}</h2>
-                <p className="text-gray-600">{t('reg.alertPrefsDesc')}</p>
-              </div>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            <div className="text-center mb-6">
+              <Bell className="w-12 h-12 text-blue-600 mx-auto mb-3" />
+              <h3 className="text-xl font-semibold text-gray-900">Alert Preferences</h3>
+              <p className="text-gray-600">Choose how you want to receive flood alerts</p>
+            </div>
+            
+            <div className="space-y-4">
               <div className="space-y-4">
-                <label className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg hover:from-blue-100 hover:to-indigo-100 transition-all cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={registrationData.alerts.sms} 
-                    onChange={e => updateData('alerts', { ...registrationData.alerts, sms: e.target.checked })} 
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 transform hover:scale-110 transition-transform"
+                <label className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={registrationData.alerts.sms}
+                    onChange={(e) => updateData('alerts', { 
+                      ...registrationData.alerts, 
+                      sms: e.target.checked 
+                    })}
+                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="text-2xl">📱</span>
-                  <span className="text-sm font-medium text-gray-800">{t('reg.smsAlerts')}</span>
+                  <div className="ml-3">
+                    <div className="font-medium text-gray-900">SMS Alerts</div>
+                    <div className="text-sm text-gray-600">Receive critical flood warnings via SMS</div>
+                  </div>
                 </label>
-                <label className="flex items-center space-x-4 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg hover:from-emerald-100 hover:to-teal-100 transition-all cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={registrationData.alerts.whatsapp} 
-                    onChange={e => updateData('alerts', { ...registrationData.alerts, whatsapp: e.target.checked })} 
-                    className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 transform hover:scale-110 transition-transform"
+                
+                <label className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={registrationData.alerts.whatsapp}
+                    onChange={(e) => updateData('alerts', { 
+                      ...registrationData.alerts, 
+                      whatsapp: e.target.checked 
+                    })}
+                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="text-2xl">💬</span>
-                  <span className="text-sm font-medium text-gray-800">{t('reg.whatsappAlerts')}</span>
+                  <div className="ml-3">
+                    <div className="font-medium text-gray-900">WhatsApp Alerts</div>
+                    <div className="text-sm text-gray-600">Get detailed updates on WhatsApp</div>
+                  </div>
                 </label>
-                <p className="text-xs text-gray-500 text-center">💡 {t('reg.selectOne')}</p>
               </div>
-            </div>
-            <div className="flex space-x-3 mt-auto pt-2 pb-2 bg-white/80 rounded-b-xl">
-              <Button 
+              
+              <button 
+                onClick={submitRegistration} 
+                disabled={loading}
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center space-x-2"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Creating Account...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Complete Registration</span>
+                  </>
+                )}
+              </button>
+              
+              <button 
                 onClick={prevStep} 
-                variant="secondary" 
-                className="flex-1 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 transform hover:scale-105 transition-all duration-200"
+                className="w-full py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all"
               >
-                ← Back <span className="ml-2">↩️</span>
-              </Button>
-              <Button 
-                onClick={() => { 
-                  login('demo-token', 'citizen');
-                  navigate('/dashboard', { replace: true }); 
-                }} 
-                disabled={!canComplete}
-                className="flex-1 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Complete Setup <span className="ml-2">🎉</span>
-              </Button>
+                Back
+              </button>
             </div>
-          </div>
+          </motion.div>
         )
-
+      
       default:
         return null
     }
   }
 
-  const renderOtpModal = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Strong blur and dim overlay */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
-      <div className="relative bg-gradient-to-br from-blue-100 via-white to-indigo-100 rounded-3xl shadow-2xl p-6 w-72 flex flex-col items-center animate-fade-in">
-        <div className="w-16 h-24 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-          <span className="text-3xl">📱</span>
-        </div>
-        <h2 className="text-lg font-bold text-gray-800 mb-1">Enter OTP</h2>
-        <p className="text-xs text-gray-600 mb-4">Enter the 4-digit code sent to your phone</p>
-        <div className="flex space-x-2 mb-4">
-          {otpDigits.map((digit, i) => (
-            <input
-              key={i}
-              ref={otpInputs[i]}
-              type="text"
-              maxLength={1}
-              value={digit}
-              onChange={e => handleOtpInput(i, e.target.value)}
-              className="w-10 h-12 text-2xl text-center border-2 border-blue-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all font-mono bg-white"
-              autoFocus={i === 0}
-            />
-          ))}
-        </div>
-        <div className="grid grid-cols-3 gap-2 mb-2">
-          {[1,2,3,4,5,6,7,8,9,0].map((num, i) => (
-            <button
-              key={i}
-              className="w-12 h-10 bg-blue-100 rounded-lg text-xl font-bold text-blue-700 hover:bg-blue-200 transition-all"
-              onClick={() => {
-                const idx = otpDigits.findIndex(d => d === '')
-                if (idx !== -1) handleOtpInput(idx, num.toString())
-              }}
-            >{num}</button>
-          ))}
-        </div>
-        <button
-          className="mt-2 text-xs text-blue-600 hover:underline"
-          onClick={() => setOtpDigits(['', '', '', ''])}
-        >Clear</button>
-      </div>
-    </div>
-  )
-
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col overflow-hidden animate-fade-in">
-      <div className="max-w-2xl mx-auto px-2 flex-1 flex flex-col min-h-0">
-        {/* Header */}
-        <div className="text-center mb-4 animate-slide-down">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl animate-enhanced-pulse">
-            <span className="text-2xl">🚀</span>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link to="/" className="flex items-center space-x-2">
+              <Shield className="w-8 h-8 text-blue-600" />
+              <span className="text-xl font-bold text-gray-900">AegisFlood</span>
+            </Link>
+            <Link 
+              to="/login" 
+              className="text-gray-600 hover:text-gray-900 transition-colors flex items-center space-x-1"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Login</span>
+            </Link>
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-1">
-            Get Started
-          </h1>
-          <p className="text-base text-gray-600">Join our flood monitoring community</p>
         </div>
-        {/* Navigation */}
-        <div className="flex items-center justify-between mb-4">
-          <Link to="/" className="text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs">
-            ← Back to Home
-          </Link>
-          <Link to="/" className="text-blue-600 hover:text-blue-800 font-medium transition-colors text-xs">
-            🏠 Home
-          </Link>
-        </div>
-        {/* Progress Steps */}
-        <div className="mb-4 animate-slide-up">
-          <div className="text-center mb-2">
-            <p className="text-xs text-gray-600 mb-1">Step {currentStep} of 4</p>
-            <div className="w-full bg-gray-200 rounded-full h-1">
-              <div 
-                className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 h-1 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${(currentStep / 4) * 100}%` }}
-              ></div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md mx-auto">
+          {/* Header */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
+          >
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Join AegisFlood</h1>
+            <p className="text-gray-600">
+              Step {currentStep} of 4: {steps.find(s => s.id === currentStep)?.title}
+            </p>
+          </motion.div>
+
+          {/* Progress Bar */}
+          <motion.div 
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            className="mb-8"
+          >
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${(currentStep / 4) * 100}%` }}
+                transition={{ duration: 0.5 }}
+                className="bg-blue-600 h-2 rounded-full"
+              />
             </div>
-          </div>
-          <div className="flex items-center justify-between">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-base font-semibold transition-all duration-300 transform hover:scale-110 ${
-                  step.id < currentStep 
-                    ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-lg' 
-                    : step.id === currentStep 
-                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-xl scale-110' 
-                    : 'bg-gray-200 text-gray-500'
-                }`}>
-                  {step.id < currentStep ? '✓' : step.icon}
-                </div>
-                <span className={`text-[10px] mt-1 font-medium ${
-                  step.id <= currentStep ? 'text-gray-800' : 'text-gray-500'
-                }`}>
-                  {step.title}
-                </span>
-                {index < steps.length - 1 && (
-                  <div className={`flex-1 h-0.5 mx-1 mt-2 transition-all duration-300 ${
-                    step.id < currentStep ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gray-200'
-                  }`} style={{ width: '12px' }} />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Step Content */}
-        <Card className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col flex-1 min-h-0 max-h-[calc(100vh-180px)] justify-between">
-          <div className="flex-1 min-h-0 flex flex-col justify-between">
+          </motion.div>
+
+          {/* Step Content */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-lg p-6 mb-6"
+          >
             {renderStepContent()}
-            {message && (
-              <div className={`mt-2 p-2 rounded-lg text-xs font-medium animate-slide-right ${
-                message.includes('Error') || message.includes('Invalid') 
-                  ? 'bg-gradient-to-r from-red-50 to-pink-50 text-red-700 border border-red-200' 
-                  : 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-200'
-              }`}>
-                <span className="mr-1">
-                  {message.includes('Error') || message.includes('Invalid') ? '❌' : '✅'}
-                </span>
-                {message}
-              </div>
-            )}
-          </div>
-        </Card>
+          </motion.div>
+
+          {/* Error/Success Messages */}
+          {(error || message) && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`p-4 rounded-lg text-center mb-6 ${
+                error 
+                  ? 'bg-red-50 text-red-700 border border-red-200'
+                  : 'bg-green-50 text-green-700 border border-green-200'
+              }`}
+            >
+              {error || message}
+            </motion.div>
+          )}
+
+          {/* Step Indicators */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex justify-center space-x-3"
+          >
+            {steps.map((step) => {
+              const StepIcon = step.icon
+              return (
+                <div
+                  key={step.id}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    step.id <= currentStep
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-gray-200 text-gray-500'
+                  }`}
+                >
+                  {step.id < currentStep ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : step.id === currentStep ? (
+                    <StepIcon className="w-5 h-5" />
+                  ) : (
+                    <span className="text-sm font-medium">{step.id}</span>
+                  )}
+                </div>
+              )
+            })}
+          </motion.div>
+        </div>
       </div>
-      {otpSent && currentStep === 2 && renderOtpModal()}
     </div>
   )
 }

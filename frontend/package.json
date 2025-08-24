@@ -9,10 +9,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.7",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "@types/three": "^0.179.0",
     "axios": "^1.7.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.26.1"
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.541.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.1",
+    "tailwind-merge": "^3.3.1",
+    "three": "^0.158.0",
+    "three-mesh-bvh": "^0.8.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
@@ -22,10 +33,6 @@
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4",
-    "vite": "^5.4.1"
+    "vite": "^7.1.3"
   }
 }
-
-
-
-

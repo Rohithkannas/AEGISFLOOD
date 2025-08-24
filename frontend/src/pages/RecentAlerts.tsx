@@ -1,6 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Card, Button, StatusPill } from '../components/ui';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { 
+  Shield, 
+  AlertTriangle, 
+  Clock, 
+  MapPin, 
+  Filter, 
+  Search,
+  Bell,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  ChevronRight,
+  Eye,
+  CheckCircle,
+  AlertCircle,
+  Info
+} from 'lucide-react';
 
 interface Alert {
   id: string;
@@ -15,7 +34,7 @@ interface Alert {
 }
 
 const RecentAlerts: React.FC = () => {
-  const { token, role } = useAuth();
+  const { token, role, logout } = useAuth();
   const [alerts, setAlerts] = useState<Alert[]>([
     {
       id: '1',
@@ -71,139 +90,365 @@ const RecentAlerts: React.FC = () => {
       status: 'expired',
       icon: '🌦️',
       affectedAreas: ['All Areas']
+    },
+    {
+      id: '6',
+      title: 'Dam Water Release Alert',
+      description: 'Scheduled water release from upstream dam will increase river levels.',
+      severity: 'medium',
+      location: 'Brahmaputra River',
+      timestamp: '1 day ago',
+      status: 'resolved',
+      icon: '🏗️',
+      affectedAreas: ['Riverfront Areas', 'Ghat Areas']
+    },
+    {
+      id: '7',
+      title: 'Urban Flooding Risk',
+      description: 'Poor drainage system may cause waterlogging in commercial areas.',
+      severity: 'low',
+      location: 'Commercial District',
+      timestamp: '1 day ago',
+      status: 'expired',
+      icon: '🏢',
+      affectedAreas: ['GS Road', 'Zoo Road', 'MG Road']
+    },
+    {
+      id: '8',
+      title: 'Emergency Shelter Setup',
+      description: 'Temporary shelters established for displaced residents.',
+      severity: 'high',
+      location: 'Multiple Locations',
+      timestamp: '2 days ago',
+      status: 'active',
+      icon: '🏠',
+      affectedAreas: ['Relief Camps', 'Community Centers']
     }
   ]);
 
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'resolved' | 'expired'>('all');
   const [filterSeverity, setFilterSeverity] = useState<'all' | 'low' | 'medium' | 'high' | 'critical'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const filteredAlerts = alerts.filter(alert => {
     const statusMatch = filterStatus === 'all' || alert.status === filterStatus;
     const severityMatch = filterSeverity === 'all' || alert.severity === filterSeverity;
-    return statusMatch && severityMatch;
+    const searchMatch = searchTerm === '' || 
+      alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alert.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alert.location.toLowerCase().includes(searchTerm.toLowerCase());
+    return statusMatch && severityMatch && searchMatch;
   });
+
+  const getSeverityIcon = (severity: string) => {
+    switch (severity) {
+      case 'low': return <Info className="w-4 h-4" />;
+      case 'medium': return <AlertTriangle className="w-4 h-4" />;
+      case 'high': return <AlertCircle className="w-4 h-4" />;
+      case 'critical': return <Shield className="w-4 h-4" />;
+      default: return <Info className="w-4 h-4" />;
+    }
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'low': return 'from-green-400 to-green-600';
-      case 'medium': return 'from-yellow-400 to-orange-500';
-      case 'high': return 'from-orange-400 to-red-500';
-      case 'critical': return 'from-red-500 to-red-700';
-      default: return 'from-gray-400 to-gray-600';
+      case 'low': return 'bg-blue-500 text-white';
+      case 'medium': return 'bg-yellow-500 text-white';
+      case 'high': return 'bg-orange-500 text-white';
+      case 'critical': return 'bg-red-500 text-white';
+      default: return 'bg-gray-500 text-white';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return <AlertCircle className="w-3 h-3" />;
+      case 'resolved': return <CheckCircle className="w-3 h-3" />;
+      case 'expired': return <Clock className="w-3 h-3" />;
+      default: return <Info className="w-3 h-3" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-red-100 text-red-800 border-red-200';
-      case 'resolved': return 'bg-green-100 text-green-800 border-green-200';
-      case 'expired': return 'bg-gray-100 text-gray-800 border-gray-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'active': return 'bg-red-50 text-red-700 border-red-200';
+      case 'resolved': return 'bg-green-50 text-green-700 border-green-200';
+      case 'expired': return 'bg-gray-50 text-gray-700 border-gray-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 overflow-hidden flex flex-col">
-      {/* Header */}
-      <div className="bg-white/90 backdrop-blur-sm border-b border-slate-200 px-4 py-2 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center animate-pulse">
-              <span className="text-lg">🚨</span>
+    <div className="min-h-screen bg-gray-50 overflow-y-auto">
+      {/* Navigation Header */}
+      <motion.header 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo and Title */}
+            <div className="flex items-center space-x-4">
+              <Link to="/dashboard" className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">AegisFlood</h1>
+                  <p className="text-sm text-gray-500">Recent Alerts</p>
+                </div>
+              </Link>
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-800">Recent Alerts</h1>
-              <p className="text-xs text-gray-600">Stay informed about flood warnings</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
-            <span className="text-xs text-gray-600">{filteredAlerts.filter(a => a.status === 'active').length} Active</span>
-          </div>
-        </div>
-      </div>
 
-      {/* Filters */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-4 py-1 flex-shrink-0">
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center space-x-1">
-            <span className="text-xs font-medium text-gray-700">Status:</span>
-            {(['all', 'active', 'resolved', 'expired'] as const).map(status => (
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
+              <Link to="/dashboard" className="text-gray-600 hover:text-gray-900 transition-colors">
+                Dashboard
+              </Link>
+              <Link to="/recent-alerts" className="text-blue-600 font-medium">
+                Recent Alerts
+              </Link>
+              <Link to="/community-chat" className="text-gray-600 hover:text-gray-900 transition-colors">
+                Community
+              </Link>
+            </nav>
+
+            {/* User Actions */}
+            <div className="flex items-center space-x-4">
+              <div className="hidden md:flex items-center space-x-2">
+                <Bell className="w-5 h-5 text-gray-400" />
+                <span className="text-sm text-gray-600">
+                  {filteredAlerts.filter(a => a.status === 'active').length} Active Alerts
+                </span>
+              </div>
+              
               <button
-                key={status}
-                onClick={() => setFilterStatus(status)}
-                className={`px-2 py-0.5 rounded-full text-xs font-medium transition-all ${
-                  filterStatus === status
-                    ? 'bg-blue-500 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
+                {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
-            ))}
+
+              <div className="hidden md:flex items-center space-x-2">
+                <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <Settings className="w-5 h-5 text-gray-600" />
+                </button>
+                <button 
+                  onClick={logout}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <LogOut className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center space-x-1">
-            <span className="text-xs font-medium text-gray-700">Severity:</span>
-            {(['all', 'low', 'medium', 'high', 'critical'] as const).map(severity => (
-              <button
-                key={severity}
-                onClick={() => setFilterSeverity(severity)}
-                className={`px-2 py-0.5 rounded-full text-xs font-medium transition-all ${
-                  filterSeverity === severity
-                    ? 'bg-blue-500 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {severity.charAt(0).toUpperCase() + severity.slice(1)}
-              </button>
-            ))}
-          </div>
+
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="md:hidden py-4 border-t border-gray-200"
+            >
+              <nav className="flex flex-col space-y-2">
+                <Link to="/dashboard" className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
+                  Dashboard
+                </Link>
+                <Link to="/recent-alerts" className="px-4 py-2 text-blue-600 bg-blue-50 rounded-lg font-medium">
+                  Recent Alerts
+                </Link>
+                <Link to="/community-chat" className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
+                  Community
+                </Link>
+                <div className="border-t border-gray-200 pt-2 mt-2">
+                  <button 
+                    onClick={logout}
+                    className="w-full px-4 py-2 text-left text-gray-600 hover:bg-gray-50 rounded-lg flex items-center space-x-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </nav>
+            </motion.div>
+          )}
         </div>
-      </div>
+      </motion.header>
 
       {/* Main Content */}
-      <div className="flex-1 p-2 min-h-0 max-h-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 max-h-full">
-          {filteredAlerts.slice(0, 6).map((alert, index) => (
-            <Card key={alert.id} className="p-2 hover:shadow-xl transition-all duration-300 animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
-              <div className="flex items-start space-x-2">
-                <div className={`w-8 h-8 bg-gradient-to-br ${getSeverityColor(alert.severity)} rounded-full flex items-center justify-center text-lg animate-bounce`}>
-                  {alert.icon}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Recent Alerts</h2>
+              <p className="text-gray-600">Stay informed about flood warnings and emergency updates</p>
+            </div>
+            <div className="flex items-center space-x-2 bg-white rounded-lg px-4 py-2 border border-gray-200">
+              <AlertTriangle className="w-5 h-5 text-orange-500" />
+              <span className="text-sm font-medium text-gray-700">
+                {filteredAlerts.filter(a => a.status === 'active').length} Active
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Search and Filters */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-xl border border-gray-200 p-6 mb-8"
+        >
+          {/* Search Bar */}
+          <div className="mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search alerts by title, description, or location..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Filter Buttons */}
+          <div className="flex flex-wrap gap-4">
+            <div className="flex items-center space-x-2">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Status:</span>
+              <div className="flex space-x-2">
+                {(['all', 'active', 'resolved', 'expired'] as const).map(status => (
+                  <button
+                    key={status}
+                    onClick={() => setFilterStatus(status)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                      filterStatus === status
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-gray-700">Severity:</span>
+              <div className="flex space-x-2">
+                {(['all', 'low', 'medium', 'high', 'critical'] as const).map(severity => (
+                  <button
+                    key={severity}
+                    onClick={() => setFilterSeverity(severity)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                      filterSeverity === severity
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {severity.charAt(0).toUpperCase() + severity.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Alerts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {filteredAlerts.map((alert, index) => (
+            <motion.div
+              key={alert.id}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 group"
+            >
+              <div className="flex items-start space-x-4">
+                {/* Severity Icon */}
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getSeverityColor(alert.severity)} shadow-sm`}>
+                  {getSeverityIcon(alert.severity)}
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-base font-semibold text-gray-800">{alert.title}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(alert.status)}`}>{alert.status.charAt(0).toUpperCase() + alert.status.slice(1)}</span>
+
+                {/* Alert Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      {alert.title}
+                    </h3>
+                    <div className={`flex items-center space-x-1 px-2 py-1 rounded-lg border text-xs font-medium ${getStatusColor(alert.status)}`}>
+                      {getStatusIcon(alert.status)}
+                      <span>{alert.status.charAt(0).toUpperCase() + alert.status.slice(1)}</span>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-600 mb-1">{alert.description}</p>
-                  <div className="flex items-center space-x-2 text-[10px] text-gray-500 mb-1">
-                    <span className="flex items-center">
-                      <span className="mr-0.5">📍</span>
-                      {alert.location}
-                    </span>
-                    <span className="flex items-center">
-                      <span className="mr-0.5">⏰</span>
-                      {alert.timestamp}
-                    </span>
+
+                  <p className="text-gray-600 mb-4 leading-relaxed">{alert.description}</p>
+
+                  {/* Location and Time */}
+                  <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                    <div className="flex items-center space-x-1">
+                      <MapPin className="w-4 h-4" />
+                      <span>{alert.location}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>{alert.timestamp}</span>
+                    </div>
                   </div>
+
+                  {/* Affected Areas */}
                   {alert.affectedAreas.length > 0 && (
-                    <div className="mt-1 pt-1 border-t border-gray-200">
-                      <p className="text-[10px] font-medium text-gray-700 mb-0.5">Affected Areas:</p>
-                      <div className="flex flex-wrap gap-1">
+                    <div className="border-t border-gray-100 pt-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Affected Areas:</p>
+                      <div className="flex flex-wrap gap-2">
                         {alert.affectedAreas.map((area, areaIndex) => (
-                          <span key={areaIndex} className="px-1 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded-full animate-pulse">
+                          <span 
+                            key={areaIndex} 
+                            className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg"
+                          >
                             {area}
                           </span>
                         ))}
                       </div>
                     </div>
                   )}
+
+                  {/* Action Button */}
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 text-sm font-medium group-hover:translate-x-1 transition-transform">
+                      <Eye className="w-4 h-4" />
+                      <span>View Details</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </Card>
+            </motion.div>
           ))}
         </div>
-      </div>
+
+        {/* Empty State */}
+        {filteredAlerts.length === 0 && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <AlertTriangle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No alerts found</h3>
+            <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+          </motion.div>
+        )}
+      </main>
     </div>
   );
 };
