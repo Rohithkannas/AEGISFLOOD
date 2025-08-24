@@ -20,7 +20,7 @@ export default function Home() {
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-neutral-600 hover:text-neutral-900 transition-colors">Features</a>
-              <a href="#solutions" className="text-neutral-600 hover:text-neutral-900 transition-colors">Solutions</a>
+              <a href="https://youtu.be/OXHTlMPbX7o?si=msPIHkCgc_ivWQlL" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors">Solutions</a>
               <Link to="/login" className="px-4 py-2 bg-neutral-900 text-neutral-0 rounded-lg hover:bg-neutral-800 transition-colors">
                 Sign In
               </Link>

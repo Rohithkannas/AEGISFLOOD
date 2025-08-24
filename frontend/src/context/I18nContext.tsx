@@ -138,7 +138,21 @@ const translations: Record<Language, Record<string, string>> = {
 		'predictions.viewPredictions': 'View flood risk predictions and forecasts',
 		'alerts.warning': 'Warning',
 		'alerts.danger': 'Danger',
-		'alerts.info': 'Info'
+		'alerts.info': 'Info',
+
+		// Map & Legend
+		'map.layers': 'Map Layers',
+		'map.floodRisk': 'Flood Risk',
+		'map.rainfallLevel': 'Rainfall Level',
+		'map.waterLevel': 'Water Level',
+		'map.populationDensity': 'Population Density',
+		'map.risk': 'Risk',
+		'map.density': 'Density',
+		'map.biharDistrict': 'Bihar District',
+		'legend.light': 'Light',
+		'legend.moderate': 'Moderate',
+		'legend.heavy': 'Heavy',
+		'legend.normal': 'Normal'
 	},
 	hi: {
 		'app.home': 'होम',
@@ -269,7 +283,21 @@ const translations: Record<Language, Record<string, string>> = {
 		'predictions.viewPredictions': 'बाढ़ जोखिम पूर्वानुमान और पूर्वानुमान देखें',
 		'alerts.warning': 'चेतावनी',
 		'alerts.danger': 'खतरा',
-		'alerts.info': 'जानकारी'
+		'alerts.info': 'जानकारी',
+
+		// Map & Legend
+		'map.layers': 'मानचित्र लेयर्स',
+		'map.floodRisk': 'बाढ़ जोखिम',
+		'map.rainfallLevel': 'वर्षा स्तर',
+		'map.waterLevel': 'जल स्तर',
+		'map.populationDensity': 'जनसंख्या घनत्व',
+		'map.risk': 'जोखिम',
+		'map.density': 'घनत्व',
+		'map.biharDistrict': 'बिहार जिला',
+		'legend.light': 'हल्की',
+		'legend.moderate': 'मध्यम',
+		'legend.heavy': 'भारी',
+		'legend.normal': 'सामान्य'
 	},
 	as: {
 		'app.home': 'হোম',
@@ -357,7 +385,7 @@ const translations: Record<Language, Record<string, string>> = {
 		'settings.darkMode': 'ডাৰ্ক মোড',
 		'settings.fontSize': 'ফন্টৰ আকাৰ',
 		'settings.privacySecurity': 'গোপনীয়তা আৰু সুৰক্ষা',
-		'settings.twoFA': '২FA',
+		'settings.twoFA': '2FA',
 		'settings.dataEncryption': 'তথ্যৰ এনক্ৰিপশন',
 		'settings.managePreferences': 'আপোনাৰ পছন্দসমূহ পৰিচালনা কৰক',
 
@@ -400,7 +428,21 @@ const translations: Record<Language, Record<string, string>> = {
 		'predictions.viewPredictions': 'বন্যাৰ বিপদৰ পূৰ্বাভাস আৰু ভৱিষ্যদ্বাণী চাওক',
 		'alerts.warning': 'সতৰ্কতা',
 		'alerts.danger': 'বিপদ',
-		'alerts.info': 'তথ্য'
+		'alerts.info': 'তথ্য',
+
+		// Map & Legend
+		'map.layers': 'মানচিত্ৰৰ স্তৰসমূহ',
+		'map.floodRisk': 'বন্যাৰ বিপদ',
+		'map.rainfallLevel': 'বৰষুণৰ স্তৰ',
+		'map.waterLevel': 'পানীৰ স্তৰ',
+		'map.populationDensity': 'জনসংখ্যাৰ ঘনত্ব',
+		'map.risk': 'বিপদ',
+		'map.density': 'ঘনত্ব',
+		'map.biharDistrict': 'বিহাৰৰ জিলা',
+		'legend.light': 'লঘু',
+		'legend.moderate': 'মধ্যম',
+		'legend.heavy': 'ভাৰী',
+		'legend.normal': 'স্বাভাৱিক'
 	},
 	ta: {
 		'app.home': 'முகப்பு',
@@ -531,7 +573,21 @@ const translations: Record<Language, Record<string, string>> = {
 		'predictions.viewPredictions': 'வெள்ள ஆபத்து முன்கணிப்புகள் மற்றும் முன்கணிப்புகளைக் காண்க',
 		'alerts.warning': 'எச்சரிக்கை',
 		'alerts.danger': 'ஆபத்து',
-		'alerts.info': 'தகவல்'
+		'alerts.info': 'தகவல்',
+
+		// Map & Legend
+		'map.layers': 'வரைபட அடுக்குகள்',
+		'map.floodRisk': 'வெள்ள ஆபத்து',
+		'map.rainfallLevel': 'மழை நிலை',
+		'map.waterLevel': 'நீர் மட்டம்',
+		'map.populationDensity': 'மக்கள் அடர்த்தி',
+		'map.risk': 'ஆபத்து',
+		'map.density': 'அடர்த்தி',
+		'map.biharDistrict': 'பீஹார் மாவட்டம்',
+		'legend.light': 'இலேசான',
+		'legend.moderate': 'நடுத்தர',
+		'legend.heavy': 'கன',
+		'legend.normal': 'சாதாரண'
 	}
 }
 

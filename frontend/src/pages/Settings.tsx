@@ -2,79 +2,89 @@ import Card from '../components/shared/Card'
 import Toggle from '../components/shared/Toggle'
 import { useState } from 'react'
 import { useI18n } from '../context/I18nContext'
+import { useTheme } from '../context/ThemeContext'
+import { Bell, Globe, Moon, Shield, Volume2, Eye, Sun } from 'lucide-react'
 
 export default function Settings() {
   const { t } = useI18n()
+  const { theme, toggleTheme } = useTheme()
   const [sms, setSms] = useState(true)
   const [whatsapp, setWhatsapp] = useState(false)
   const [email, setEmail] = useState(true)
   const [pushNotifications, setPushNotifications] = useState(false)
   
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden flex flex-col">
-      <div className="max-w-3xl mx-auto flex-1 flex flex-col min-h-0 p-2">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-y-auto">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
-        <div className="text-center mb-4 animate-slide-down">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl animate-enhanced-pulse">
-            <span className="text-2xl">⚙️</span>
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-2xl text-white">⚙️</span>
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             {t('app.settings')}
           </h1>
-          <p className="text-base text-gray-600">{t('settings.managePreferences')}</p>
+          <p className="text-lg text-gray-600 dark:text-gray-400">{t('settings.managePreferences')}</p>
         </div>
         {/* Settings Categories */}
-        <div className="grid md:grid-cols-2 gap-2 flex-1 min-h-0">
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-0 shadow-xl animate-slide-up flex-1 min-h-0">
-            <div className="flex items-center mb-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mr-2 shadow-lg hover:animate-bounce transition-all duration-300">
-                <span className="text-lg">🔔</span>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
+                <span className="text-lg text-white">🔔</span>
               </div>
-              <h2 className="text-lg font-bold text-gray-800">{t('settings.alertPreferences')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.alertPreferences')}</h2>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                                 <span className="text-gray-700 font-medium text-sm">{t('settings.emailAlerts')}</span>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{t('settings.emailAlerts')}</span>
                 <Toggle checked={true} onChange={() => {}} />
               </div>
-              <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                                 <span className="text-gray-700 font-medium text-sm">{t('settings.pushNotifications')}</span>
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{t('settings.pushNotifications')}</span>
                 <Toggle checked={false} onChange={() => {}} />
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-emerald-50 to-teal-50 border-0 shadow-xl animate-slide-up flex-1 min-h-0">
-            <div className="flex items-center mb-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mr-2 shadow-lg hover:animate-bounce transition-all duration-300">
-                <span className="text-lg">🖥️</span>
+          <Card className="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center mr-3 shadow-sm">
+                <span className="text-lg text-white">🖥️</span>
               </div>
-              <h2 className="text-lg font-bold text-gray-800">{t('settings.displaySettings')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.displaySettings')}</h2>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                                 <span className="text-gray-700 font-medium text-sm">{t('settings.darkMode')}</span>
-                <Toggle checked={false} onChange={() => {}} />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-center">
+                  {theme === 'dark' ? (
+                    <Moon className="w-4 h-4 text-gray-600 mr-2" />
+                  ) : (
+                    <Sun className="w-4 h-4 text-gray-600 mr-2" />
+                  )}
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">{t('settings.darkMode')}</span>
+                </div>
+                <Toggle checked={theme === 'dark'} onChange={toggleTheme} />
               </div>
-              <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                                 <span className="text-gray-700 font-medium text-sm">{t('settings.fontSize')}</span>
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{t('settings.fontSize')}</span>
                 <Toggle checked={false} onChange={() => {}} />
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-pink-50 to-purple-50 border-0 shadow-xl animate-slide-up flex-1 min-h-0">
-            <div className="flex items-center mb-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center mr-2 shadow-lg hover:animate-bounce transition-all duration-300">
-                <span className="text-lg">🔒</span>
+          <Card className="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
+                <span className="text-lg text-white">🔒</span>
               </div>
-              <h2 className="text-lg font-bold text-gray-800">{t('settings.privacySecurity')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.privacySecurity')}</h2>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                                 <span className="text-gray-700 font-medium text-sm">{t('settings.twoFA')}</span>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{t('settings.twoFA')}</span>
                 <Toggle checked={false} onChange={() => {}} />
               </div>
-              <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                                 <span className="text-gray-700 font-medium text-sm">{t('settings.dataEncryption')}</span>
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{t('settings.dataEncryption')}</span>
                 <Toggle checked={true} onChange={() => {}} />
               </div>
             </div>

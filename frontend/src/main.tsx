@@ -12,6 +12,7 @@ import Profile from './pages/Profile'
 import CommunityChat from './pages/CommunityChat'
 import RecentAlerts from './pages/RecentAlerts'
 import RiskPredicted from './pages/RiskPredicted'
+import AuthorityDashboard from './pages/AuthorityDashboard'
 import ProtectedRoute from './components/routing/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 import { I18nProvider } from './context/I18nContext'
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
               <Route element={<ProtectedRoute />}> 
                 <Route path="dashboard" element={<Dashboard />} />
+                <Route path="authority-dashboard" element={<AuthorityDashboard />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="community-chat" element={<CommunityChat />} />

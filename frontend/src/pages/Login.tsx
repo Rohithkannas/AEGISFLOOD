@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Shield, Eye, EyeOff, ArrowLeft, Building2, Lock, User } from 'lucide-react'
 import api from '../services/api'
@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
   const { login } = useAuth()
+  const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -19,8 +20,16 @@ export default function Login() {
     setIsLoading(true)
     
     try {
+      // Check for authority login credentials
+      if (username === 'Rohithkannas' && password === 'Rohithkannas') {
+        login('authority_token', 'authority')
+        navigate('/authority-dashboard')
+        return
+      }
+      
       const res = await api.post('/auth/admin/login', { username, password })
       login(res.data.access_token, res.data.role)
+      navigate('/dashboard')
     } catch (e) {
       setError('Invalid credentials. Please check your username and password.')
     } finally {

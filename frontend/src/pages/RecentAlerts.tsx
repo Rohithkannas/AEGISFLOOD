@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../context/I18nContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -35,57 +36,58 @@ interface Alert {
 
 const RecentAlerts: React.FC = () => {
   const { token, role, logout } = useAuth();
+  const { t } = useI18n();
   const [alerts, setAlerts] = useState<Alert[]>([
     {
       id: '1',
       title: 'Heavy Rainfall Warning',
-      description: 'Intense rainfall expected in Guwahati area with potential flooding in low-lying regions.',
+      description: 'Intense rainfall expected in Patna area with potential flooding in low-lying regions.',
       severity: 'high',
-      location: 'Guwahati, Assam',
+      location: 'Patna, Bihar',
       timestamp: '2 hours ago',
       status: 'active',
       icon: '🌧️',
-      affectedAreas: ['Fancy Bazaar', 'Paltan Bazaar', 'Uzan Bazaar']
+      affectedAreas: ['Patna City', 'Danapur', 'Phulwari Sharif']
     },
     {
       id: '2',
       title: 'River Water Level Rising',
-      description: 'Brahmaputra River water level has increased by 2.5 meters in the last 6 hours.',
+      description: 'Ganga River water level has increased by 2.5 meters in the last 6 hours.',
       severity: 'critical',
-      location: 'Brahmaputra Basin',
+      location: 'Ganga Basin',
       timestamp: '4 hours ago',
       status: 'active',
       icon: '🌊',
-      affectedAreas: ['North Guwahati', 'Kamrup Rural', 'Dispur']
+      affectedAreas: ['Muzaffarpur', 'Darbhanga', 'Begusarai']
     },
     {
       id: '3',
       title: 'Flash Flood Alert',
       description: 'Sudden water accumulation reported in several areas due to blocked drainage.',
       severity: 'medium',
-      location: 'Central Guwahati',
+      location: 'Central Patna',
       timestamp: '6 hours ago',
       status: 'resolved',
       icon: '⚡',
-      affectedAreas: ['Lachit Nagar', 'Beltola', 'Kahilipara']
+      affectedAreas: ['Boring Road', 'Kankarbagh', 'Rajendra Nagar']
     },
     {
       id: '4',
       title: 'Evacuation Notice',
       description: 'Immediate evacuation required for residents in flood-prone zones.',
       severity: 'critical',
-      location: 'South Guwahati',
+      location: 'South Patna',
       timestamp: '8 hours ago',
       status: 'active',
       icon: '🚨',
-      affectedAreas: ['Ganeshguri', 'Six Mile', 'Basistha']
+      affectedAreas: ['Patliputra', 'Kurji', 'Digha']
     },
     {
       id: '5',
       title: 'Weather Advisory',
       description: 'Moderate rainfall expected with isolated heavy spells in the evening.',
       severity: 'low',
-      location: 'Greater Guwahati',
+      location: 'Greater Patna',
       timestamp: '12 hours ago',
       status: 'expired',
       icon: '🌦️',
@@ -96,7 +98,7 @@ const RecentAlerts: React.FC = () => {
       title: 'Dam Water Release Alert',
       description: 'Scheduled water release from upstream dam will increase river levels.',
       severity: 'medium',
-      location: 'Brahmaputra River',
+      location: 'Ganga River',
       timestamp: '1 day ago',
       status: 'resolved',
       icon: '🏗️',
@@ -180,12 +182,12 @@ const RecentAlerts: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-y-auto">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-y-auto">
       {/* Navigation Header */}
       <motion.header 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200"
+        className="sticky top-0 z-50 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -196,22 +198,22 @@ const RecentAlerts: React.FC = () => {
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">AegisFlood</h1>
-                  <p className="text-sm text-gray-500">Recent Alerts</p>
+                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">AegisFlood</h1>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('recentAlerts')}</p>
                 </div>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link to="/dashboard" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Dashboard
+              <Link to="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                {t('dashboard')}
               </Link>
-              <Link to="/recent-alerts" className="text-blue-600 font-medium">
-                Recent Alerts
+              <Link to="/recent-alerts" className="text-blue-600 dark:text-blue-400 font-medium">
+                {t('recentAlerts')}
               </Link>
-              <Link to="/community-chat" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Community
+              <Link to="/community-chat" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                {t('community')}
               </Link>
             </nav>
 
@@ -219,8 +221,8 @@ const RecentAlerts: React.FC = () => {
             <div className="flex items-center space-x-4">
               <div className="hidden md:flex items-center space-x-2">
                 <Bell className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-600">
-                  {filteredAlerts.filter(a => a.status === 'active').length} Active Alerts
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {filteredAlerts.filter(a => a.status === 'active').length} {t('activeAlerts')}
                 </span>
               </div>
               
@@ -287,12 +289,12 @@ const RecentAlerts: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Recent Alerts</h2>
-              <p className="text-gray-600">Stay informed about flood warnings and emergency updates</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Flood Alerts</h2>
+              <p className="text-gray-600 dark:text-gray-400">Stay informed about flood warnings and emergency updates</p>
             </div>
-            <div className="flex items-center space-x-2 bg-white rounded-lg px-4 py-2 border border-gray-200">
+            <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg px-4 py-2 border border-gray-200 dark:border-gray-700">
               <AlertTriangle className="w-5 h-5 text-orange-500" />
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {filteredAlerts.filter(a => a.status === 'active').length} Active
               </span>
             </div>
@@ -304,7 +306,7 @@ const RecentAlerts: React.FC = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-xl border border-gray-200 p-6 mb-8"
+          className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-8"
         >
           {/* Search Bar */}
           <div className="mb-6">
@@ -371,7 +373,7 @@ const RecentAlerts: React.FC = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 group"
+              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all duration-300 group"
             >
               <div className="flex items-start space-x-4">
                 {/* Severity Icon */}
@@ -382,7 +384,7 @@ const RecentAlerts: React.FC = () => {
                 {/* Alert Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {alert.title}
                     </h3>
                     <div className={`flex items-center space-x-1 px-2 py-1 rounded-lg border text-xs font-medium ${getStatusColor(alert.status)}`}>
@@ -391,10 +393,10 @@ const RecentAlerts: React.FC = () => {
                     </div>
                   </div>
 
-                  <p className="text-gray-600 mb-4 leading-relaxed">{alert.description}</p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">{alert.description}</p>
 
                   {/* Location and Time */}
-                  <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
                     <div className="flex items-center space-x-1">
                       <MapPin className="w-4 h-4" />
                       <span>{alert.location}</span>
@@ -408,12 +410,12 @@ const RecentAlerts: React.FC = () => {
                   {/* Affected Areas */}
                   {alert.affectedAreas.length > 0 && (
                     <div className="border-t border-gray-100 pt-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Affected Areas:</p>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Affected Areas:</p>
                       <div className="flex flex-wrap gap-2">
                         {alert.affectedAreas.map((area, areaIndex) => (
                           <span 
                             key={areaIndex} 
-                            className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg"
+                            className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-lg"
                           >
                             {area}
                           </span>
@@ -422,13 +424,21 @@ const RecentAlerts: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Action Button */}
-                  <div className="mt-4 pt-4 border-t border-gray-100">
+                  {/* Action Buttons */}
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex space-x-3">
                     <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 text-sm font-medium group-hover:translate-x-1 transition-transform">
                       <Eye className="w-4 h-4" />
                       <span>View Details</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
+                    <Link 
+                      to="/dashboard"
+                      className="flex items-center space-x-2 text-green-600 hover:text-green-700 text-sm font-medium group-hover:translate-x-1 transition-transform"
+                    >
+                      <MapPin className="w-4 h-4" />
+                      <span>View on Map</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
                   </div>
                 </div>
               </div>

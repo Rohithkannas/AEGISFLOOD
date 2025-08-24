@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Shield, ArrowLeft, MapPin, Phone, Globe, Bell, CheckCircle, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { Shield, ArrowLeft, MapPin, Phone, Globe, Bell, CheckCircle, ArrowRight, Eye, EyeOff, ChevronDown } from 'lucide-react'
 import api from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../context/I18nContext'
@@ -162,17 +162,29 @@ export default function Registration() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Location
+                  Select Your District
                 </label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
+                  <select
                     value={registrationData.location}
                     onChange={(e) => updateData('location', e.target.value)}
-                    placeholder="Enter your city or district"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  />
+                    className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-white"
+                  >
+                    <option value="">Select your district</option>
+                    {[
+                      "Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur",
+                      "Bhojpur", "Buxar", "Darbhanga", "East Champaran (Motihari)", "Gaya",
+                      "Gopalganj", "Jamui", "Jehanabad", "Kaimur (Bhabua)", "Katihar",
+                      "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani",
+                      "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnea",
+                      "Rohtas", "Saharsa", "Samastipur", "Saran (Chhapra)", "Sheikhpura",
+                      "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"
+                    ].map((district) => (
+                      <option key={district} value={district}>{district}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>
               </div>
               
@@ -218,19 +230,32 @@ export default function Registration() {
                   <input
                     type="tel"
                     value={registrationData.phone}
-                    onChange={(e) => updateData('phone', e.target.value)}
-                    placeholder="Enter your phone number"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                      if (value.length <= 10) {
+                        updateData('phone', value);
+                      }
+                    }}
+                    placeholder="Enter 10-digit mobile number"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
+                      registrationData.phone.length > 0 && registrationData.phone.length !== 10
+                        ? 'border-red-400 focus:ring-red-500'
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
                     disabled={otpSent}
+                    maxLength={10}
                   />
                 </div>
+                {registrationData.phone.length > 0 && registrationData.phone.length !== 10 && (
+                  <p className="text-xs text-red-600 mt-1">Invalid number - must be 10 digits</p>
+                )}
               </div>
               
               {!otpSent ? (
                 <>
                   <button 
                     onClick={sendOtp} 
-                    disabled={!registrationData.phone || loading}
+                    disabled={!registrationData.phone || registrationData.phone.length !== 10 || loading}
                     className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   >
                     {loading ? 'Sending OTP...' : 'Send OTP'}

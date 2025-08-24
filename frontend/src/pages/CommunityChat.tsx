@@ -128,12 +128,12 @@ const CommunityChat: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-y-auto">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-y-auto">
       {/* Navigation Header */}
       <motion.header 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200"
+        className="sticky top-0 z-50 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -144,21 +144,21 @@ const CommunityChat: React.FC = () => {
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">AegisFlood</h1>
-                  <p className="text-sm text-gray-500">Community Chat</p>
+                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">AegisFlood</h1>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Community Chat</p>
                 </div>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link to="/dashboard" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link to="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Dashboard
               </Link>
-              <Link to="/recent-alerts" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link to="/recent-alerts" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Recent Alerts
               </Link>
-              <Link to="/community-chat" className="text-blue-600 font-medium">
+              <Link to="/community-chat" className="text-blue-600 dark:text-blue-400 font-medium">
                 Community
               </Link>
             </nav>
@@ -167,7 +167,7 @@ const CommunityChat: React.FC = () => {
             <div className="flex items-center space-x-4">
               <div className="hidden md:flex items-center space-x-2">
                 <Users className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   {announcements.length} Announcements
                 </span>
               </div>
@@ -235,12 +235,12 @@ const CommunityChat: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Community Chat</h2>
-              <p className="text-gray-600">Official announcements and community updates</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Community Chat</h2>
+              <p className="text-gray-600 dark:text-gray-400">Official announcements and community updates</p>
             </div>
-            <div className="flex items-center space-x-2 bg-white rounded-lg px-4 py-2 border border-gray-200">
+            <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg px-4 py-2 border border-gray-200 dark:border-gray-700">
               <Megaphone className="w-5 h-5 text-blue-500" />
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {announcements.filter(a => a.isVerified).length} Verified
               </span>
             </div>
@@ -252,7 +252,7 @@ const CommunityChat: React.FC = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-xl border border-gray-200 p-6 mb-8"
+          className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-8"
         >
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center space-x-2">
@@ -296,7 +296,7 @@ const CommunityChat: React.FC = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300"
+              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all duration-300"
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
@@ -306,7 +306,7 @@ const CommunityChat: React.FC = () => {
                   </div>
                   <div>
                     <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
                         {announcement.severity.toUpperCase()}
                       </span>
                       {announcement.isVerified && (
@@ -326,7 +326,7 @@ const CommunityChat: React.FC = () => {
               </div>
 
               {/* Title */}
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">{announcement.title}</h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{announcement.title}</h3>
 
               {/* Media */}
               <div className="mb-4">
@@ -360,20 +360,23 @@ const CommunityChat: React.FC = () => {
               </div>
 
               {/* Description */}
-              <p className="text-gray-700 mb-4 leading-relaxed">{announcement.description}</p>
+              <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">{announcement.description}</p>
 
               {/* Location */}
-              <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
                 <MapPin className="w-4 h-4" />
                 <span className="font-medium">{announcement.location}</span>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex space-x-3 pt-4 border-t border-gray-100">
-                <button className="flex-1 flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+              <div className="flex space-x-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <Link 
+                  to="/dashboard"
+                  className="flex-1 flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
                   <Map className="w-4 h-4" />
                   <span>View on Map</span>
-                </button>
+                </Link>
                 <button className="flex-1 flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
                   <Phone className="w-4 h-4" />
                   <span>Emergency Contact</span>
