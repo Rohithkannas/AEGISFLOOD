@@ -250,7 +250,7 @@ export default function Home() {
 
             <div className="text-center">
               <Link 
-                to={activeSection === 'citizens' ? '/register' : '/login'}
+                to={activeSection === 'citizens' ? '/register' : '/authority/login'}
                 className="inline-flex items-center px-8 py-4 bg-blue-600 text-neutral-0 rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium"
               >
                 {activeSection === 'citizens' ? 'Get Started' : 'Access Dashboard'}

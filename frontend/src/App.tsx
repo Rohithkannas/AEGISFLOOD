@@ -13,7 +13,7 @@ export default function App() {
   const isCommunityChat = pathname.startsWith('/community-chat')
   const isRecentAlerts = pathname.startsWith('/recent-alerts')
   const isRiskPredicted = pathname.startsWith('/risk-predicted')
-  const isAuthorityDashboard = pathname.startsWith('/authority-dashboard')
+  const isAuthorityDashboard = pathname.startsWith('/authority')
 
   const showHeader = !(isHome || isRegister || isLogin || isDashboard || isCommunityChat || isRecentAlerts || isRiskPredicted || isAuthorityDashboard)
   // Hide footer on Dashboard per request
