@@ -197,12 +197,12 @@ export default function Registration() {
                 <ArrowRight className="w-4 h-4" />
               </button>
               
-              <Link 
-                to="/login" 
-                className="w-full block text-center py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all"
+              <button 
+                disabled
+                className="w-full block text-center py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-400 bg-gray-100 cursor-not-allowed opacity-50"
               >
                 Back to Login
-              </Link>
+              </button>
             </div>
           </motion.div>
         )
@@ -440,24 +440,26 @@ export default function Registration() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-2">
-              <Shield className="w-8 h-8 text-blue-600" />
+          <div className="flex items-center justify-between h-16">
+            <Link to="/" className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
               <span className="text-xl font-bold text-gray-900">AegisFlood</span>
             </Link>
-            <Link 
-              to="/login" 
-              className="text-gray-600 hover:text-gray-900 transition-colors flex items-center space-x-1"
+            <button 
+              disabled
+              className="text-gray-400 cursor-not-allowed opacity-50 flex items-center space-x-1"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Login</span>
-            </Link>
+            </button>
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+      <div className="pt-24 pb-12 px-6">
         <div className="max-w-md mx-auto">
           {/* Header */}
           <motion.div 

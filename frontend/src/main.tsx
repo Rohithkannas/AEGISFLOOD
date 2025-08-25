@@ -5,7 +5,6 @@ import './styles/main.css'
 import App from './App'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
-import Login from './pages/Login'
 import Registration from './pages/Registration'
 import Settings from './pages/Settings'
 import Profile from './pages/Profile'
@@ -31,7 +30,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Routes>
             <Route path="/" element={<App />}> 
               <Route index element={<Home />} />
-              <Route path="login" element={<Login />} />
               <Route path="register" element={<Registration />} />
 
               <Route element={<ProtectedRoute />}> 

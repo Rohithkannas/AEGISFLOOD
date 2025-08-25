@@ -25,9 +25,12 @@ export default function Home() {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-neutral-600 hover:text-neutral-900 transition-colors">Features</a>
               <button onClick={(e) => e.preventDefault()} className="text-neutral-600 hover:text-neutral-900 transition-colors">Donate</button>
-              <Link to="/login" className="px-4 py-2 bg-neutral-900 text-neutral-0 rounded-lg hover:bg-neutral-800 transition-colors">
+              <button 
+                disabled 
+                className="px-4 py-2 bg-gray-400 text-gray-600 rounded-lg cursor-not-allowed opacity-50"
+              >
                 Sign In
-              </Link>
+              </button>
             </div>
           </div>
         </div>

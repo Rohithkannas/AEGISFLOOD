@@ -7,7 +7,7 @@ export default function Header() {
 				<h1 className="text-xl font-semibold">AegisFlood</h1>
 				<nav className="flex items-center gap-4 text-sm">
 					<Link to="/dashboard" className="text-dark-gray hover:text-dark-black">Dashboard</Link>
-					<Link to="/login" className="text-dark-gray hover:text-dark-black">Login</Link>
+					<button disabled className="text-gray-400 cursor-not-allowed opacity-50">Login</button>
 					<Link to="/register" className="text-dark-gray hover:text-dark-black">Register</Link>
 				</nav>
 			</div>

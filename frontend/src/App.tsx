@@ -8,14 +8,13 @@ export default function App() {
   const pathname = location.pathname
   const isHome = pathname === '/'
   const isRegister = pathname.startsWith('/register')
-  const isLogin = pathname.startsWith('/login')
   const isDashboard = pathname.startsWith('/dashboard')
   const isCommunityChat = pathname.startsWith('/community-chat')
   const isRecentAlerts = pathname.startsWith('/recent-alerts')
   const isRiskPredicted = pathname.startsWith('/risk-predicted')
   const isAuthorityDashboard = pathname.startsWith('/authority')
 
-  const showHeader = !(isHome || isRegister || isLogin || isDashboard || isCommunityChat || isRecentAlerts || isRiskPredicted || isAuthorityDashboard)
+  const showHeader = !(isHome || isRegister || isDashboard || isCommunityChat || isRecentAlerts || isRiskPredicted || isAuthorityDashboard)
   // Hide footer on Dashboard per request
   const showFooter = !(isHome || isRegister || isDashboard || isAuthorityDashboard)
   
