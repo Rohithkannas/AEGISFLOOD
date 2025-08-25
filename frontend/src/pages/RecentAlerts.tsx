@@ -199,21 +199,21 @@ const RecentAlerts: React.FC = () => {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-gray-900 dark:text-white">AegisFlood</h1>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('recentAlerts')}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('alerts.recentAlerts')}</p>
                 </div>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link to="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                {t('dashboard')}
+              <Link to="/dashboard" className="capitalize text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                {t('app.dashboard')}
               </Link>
-              <Link to="/recent-alerts" className="text-blue-600 dark:text-blue-400 font-medium">
-                {t('recentAlerts')}
+              <Link to="/recent-alerts" className="capitalize text-blue-600 dark:text-blue-400 font-medium">
+                {t('alerts.recentAlerts')}
               </Link>
-              <Link to="/community-chat" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
-                {t('community')}
+              <Link to="/community-chat" className="capitalize text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                {t('app.community')}
               </Link>
             </nav>
 
@@ -222,7 +222,7 @@ const RecentAlerts: React.FC = () => {
               <div className="hidden md:flex items-center space-x-2">
                 <Bell className="w-5 h-5 text-gray-400" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {filteredAlerts.filter(a => a.status === 'active').length} {t('activeAlerts')}
+                  {filteredAlerts.filter(a => a.status === 'active').length} {t('dash.activeAlerts')}
                 </span>
               </div>
               
@@ -255,14 +255,14 @@ const RecentAlerts: React.FC = () => {
               className="md:hidden py-4 border-t border-gray-200"
             >
               <nav className="flex flex-col space-y-2">
-                <Link to="/dashboard" className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-                  Dashboard
+                <Link to="/dashboard" className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg capitalize">
+                  {t('app.dashboard')}
                 </Link>
-                <Link to="/recent-alerts" className="px-4 py-2 text-blue-600 bg-blue-50 rounded-lg font-medium">
-                  Recent Alerts
+                <Link to="/recent-alerts" className="px-4 py-2 text-blue-600 bg-blue-50 rounded-lg font-medium capitalize">
+                  {t('alerts.recentAlerts')}
                 </Link>
-                <Link to="/community-chat" className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-                  Community
+                <Link to="/community-chat" className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg capitalize">
+                  {t('app.community')}
                 </Link>
                 <div className="border-t border-gray-200 pt-2 mt-2">
                   <button 
@@ -270,7 +270,7 @@ const RecentAlerts: React.FC = () => {
                     className="w-full px-4 py-2 text-left text-gray-600 hover:bg-gray-50 rounded-lg flex items-center space-x-2"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
+                    <span>{t('app.logout')}</span>
                   </button>
                 </div>
               </nav>
@@ -289,13 +289,13 @@ const RecentAlerts: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Flood Alerts</h2>
-              <p className="text-gray-600 dark:text-gray-400">Stay informed about flood warnings and emergency updates</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('alerts.recentAlerts')}</h2>
+              <p className="text-gray-600 dark:text-gray-400">{t('alerts.viewAllAlerts')}</p>
             </div>
             <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg px-4 py-2 border border-gray-200 dark:border-gray-700">
               <AlertTriangle className="w-5 h-5 text-orange-500" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {filteredAlerts.filter(a => a.status === 'active').length} Active
+                {filteredAlerts.filter(a => a.status === 'active').length} {t('alerts.status_active')}
               </span>
             </div>
           </div>
@@ -314,7 +314,7 @@ const RecentAlerts: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search alerts by title, description, or location..."
+                placeholder={t('alerts.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -326,7 +326,7 @@ const RecentAlerts: React.FC = () => {
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center space-x-2">
               <Filter className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Status:</span>
+              <span className="text-sm font-medium text-gray-700">{t('alerts.status')}:</span>
               <div className="flex space-x-2">
                 {(['all', 'active', 'resolved', 'expired'] as const).map(status => (
                   <button
@@ -338,14 +338,14 @@ const RecentAlerts: React.FC = () => {
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                    {status === 'all' ? t('alerts.status_all') : status === 'active' ? t('alerts.status_active') : status === 'resolved' ? t('alerts.status_resolved') : t('alerts.status_expired')}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-700">Severity:</span>
+              <span className="text-sm font-medium text-gray-700">{t('alerts.severity')}:</span>
               <div className="flex space-x-2">
                 {(['all', 'low', 'medium', 'high', 'critical'] as const).map(severity => (
                   <button
@@ -357,7 +357,7 @@ const RecentAlerts: React.FC = () => {
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
-                    {severity.charAt(0).toUpperCase() + severity.slice(1)}
+                    {severity === 'all' ? t('alerts.severity_all') : severity === 'low' ? t('alerts.severity_low') : severity === 'medium' ? t('alerts.severity_medium') : severity === 'high' ? t('alerts.severity_high') : t('alerts.severity_critical')}
                   </button>
                 ))}
               </div>
@@ -389,7 +389,7 @@ const RecentAlerts: React.FC = () => {
                     </h3>
                     <div className={`flex items-center space-x-1 px-2 py-1 rounded-lg border text-xs font-medium ${getStatusColor(alert.status)}`}>
                       {getStatusIcon(alert.status)}
-                      <span>{alert.status.charAt(0).toUpperCase() + alert.status.slice(1)}</span>
+                      <span>{alert.status === 'active' ? t('alerts.status_active') : alert.status === 'resolved' ? t('alerts.status_resolved') : t('alerts.status_expired')}</span>
                     </div>
                   </div>
 
@@ -403,6 +403,7 @@ const RecentAlerts: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-1">
                       <Clock className="w-4 h-4" />
+                      <span>{t('alerts.timestamp')}:</span>
                       <span>{alert.timestamp}</span>
                     </div>
                   </div>
@@ -410,7 +411,7 @@ const RecentAlerts: React.FC = () => {
                   {/* Affected Areas */}
                   {alert.affectedAreas.length > 0 && (
                     <div className="border-t border-gray-100 pt-4">
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Affected Areas:</p>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('alerts.affectedAreas')}:</p>
                       <div className="flex flex-wrap gap-2">
                         {alert.affectedAreas.map((area, areaIndex) => (
                           <span 
@@ -428,7 +429,7 @@ const RecentAlerts: React.FC = () => {
                   <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex space-x-3">
                     <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 text-sm font-medium group-hover:translate-x-1 transition-transform">
                       <Eye className="w-4 h-4" />
-                      <span>View Details</span>
+                      <span>{t('alerts.viewDetails')}</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
                     <Link 
@@ -436,7 +437,7 @@ const RecentAlerts: React.FC = () => {
                       className="flex items-center space-x-2 text-green-600 hover:text-green-700 text-sm font-medium group-hover:translate-x-1 transition-transform"
                     >
                       <MapPin className="w-4 h-4" />
-                      <span>View on Map</span>
+                      <span>{t('alerts.viewOnMap')}</span>
                       <ChevronRight className="w-4 h-4" />
                     </Link>
                   </div>
@@ -454,8 +455,8 @@ const RecentAlerts: React.FC = () => {
             className="text-center py-12"
           >
             <AlertTriangle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No alerts found</h3>
-            <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('alerts.emptyTitle')}</h3>
+            <p className="text-gray-500">{t('alerts.emptyDesc')}</p>
           </motion.div>
         )}
       </main>

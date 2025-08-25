@@ -12,9 +12,10 @@ interface RiskDataPoint {
 interface RiskChartProps {
   data?: RiskDataPoint[]
   selectedHour?: number
+  currentRiskLevel?: 'low' | 'medium' | 'high' | 'critical'
 }
 
-const RiskChart: React.FC<RiskChartProps> = ({ data, selectedHour = 12 }) => {
+const RiskChart: React.FC<RiskChartProps> = ({ data, selectedHour = 12, currentRiskLevel }) => {
   const { t } = useI18n()
 
   // Generate sample data if none provided
@@ -40,6 +41,16 @@ const RiskChart: React.FC<RiskChartProps> = ({ data, selectedHour = 12 }) => {
 
   const trend = getRiskTrend()
   const currentRisk = chartData[selectedHour]?.risk || 0
+
+  const colorByRisk: Record<string, string> = {
+    low: '#22c55e',       // green-500
+    medium: '#eab308',    // yellow-500
+    high: '#f97316',      // orange-500
+    critical: '#ef4444',  // red-500
+    default: '#3b82f6'    // blue-500
+  }
+  const lineColor = currentRiskLevel ? (colorByRisk[currentRiskLevel] || colorByRisk.default) : colorByRisk.default
+  const pointActive = currentRiskLevel ? (colorByRisk[currentRiskLevel] || '#1d4ed8') : '#1d4ed8'
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -94,7 +105,7 @@ const RiskChart: React.FC<RiskChartProps> = ({ data, selectedHour = 12 }) => {
           {/* Risk line */}
           <polyline
             fill="none"
-            stroke="#3b82f6"
+            stroke={lineColor}
             strokeWidth="2"
             points={chartData.map((d, i) => 
               `${(i / 23) * 400},${200 - (d.risk * 2)}`
@@ -108,7 +119,7 @@ const RiskChart: React.FC<RiskChartProps> = ({ data, selectedHour = 12 }) => {
               cx={(i / 23) * 400}
               cy={200 - (d.risk * 2)}
               r={i === selectedHour ? "6" : "3"}
-              fill={i === selectedHour ? "#1d4ed8" : "#3b82f6"}
+              fill={i === selectedHour ? pointActive : lineColor}
               className="transition-all duration-200"
             />
           ))}
@@ -119,7 +130,7 @@ const RiskChart: React.FC<RiskChartProps> = ({ data, selectedHour = 12 }) => {
             y1="0"
             x2={(selectedHour / 23) * 400}
             y2="200"
-            stroke="#1d4ed8"
+            stroke={pointActive}
             strokeWidth="2"
             strokeDasharray="4,4"
             opacity="0.7"

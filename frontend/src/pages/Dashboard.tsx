@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../context/I18nContext'
+import { useTheme } from '../context/ThemeContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import BiharFloodMap from '../components/BiharFloodMap'
@@ -26,6 +27,8 @@ import {
   Thermometer,
   Wind,
   Eye,
+  Sun,
+  Moon,
   Phone,
   Mail,
   User
@@ -49,6 +52,7 @@ interface CityRisk {
 export default function Dashboard() {
   const { logout } = useAuth()
   const { t } = useI18n()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   
   const [floodRisk] = useState({
@@ -118,14 +122,22 @@ export default function Dashboard() {
 
           {/* Center: Tabs */}
           <div className="hidden md:flex items-center space-x-2">
-            <span className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">Dashboard</span>
-            <Link to="/recent-alerts" className="px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">Alerts</Link>
-            <Link to="/risk-predicted" className="px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">Predictions</Link>
-            <Link to="/recent-alerts" className="px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">Announcements</Link>
+            <span className="px-3 py-1 rounded-full text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">{t('app.dashboard')}</span>
+            <Link to="/recent-alerts" className="px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">{t('app.alerts')}</Link>
+            <Link to="/risk-predicted" className="px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">{t('app.predictions')}</Link>
+            <Link to="/recent-alerts" className="px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">{t('app.chat')}</Link>
           </div>
 
-          {/* Right: Icons */}
+          {/* Right: Icons + Theme Toggle */}
           <div className="flex items-center space-x-3">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
+              aria-label="Toggle Theme"
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <Link to="/recent-alerts" className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
               <Bell className="w-5 h-5" />
               {unreadAlerts.length > 0 && (
@@ -237,14 +249,14 @@ export default function Dashboard() {
                     <MapPin className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Risk Map</h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Bihar flood risk visualization</p>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('dash.riskMap')}</h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('dash.interactiveRiskMap')}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                     <Activity className="w-3 h-3 mr-1" />
-                    Live
+                    {t('dash.live')}
                   </span>
                 </div>
               </div>
@@ -348,6 +360,7 @@ export default function Dashboard() {
             >
               <RiskChart 
                 selectedHour={selectedHour}
+                currentRiskLevel={selectedRiskLevel}
               />
             </motion.div>
           </div>
